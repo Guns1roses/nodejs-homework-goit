@@ -13,4 +13,5 @@ module.exports = {
   removeContact,
   updateContact,
   updateFavorite,
+
 };

@@ -1,9 +1,7 @@
 const { Contact } = require("./contact");
-const { contactAddSchema } = require("./contact");
-const { validateSchema } = require("./contact");
+const { User } = require("./user");
 
 module.exports = {
   Contact,
-  contactAddSchema,
-  validateSchema,
+  User,
 };
