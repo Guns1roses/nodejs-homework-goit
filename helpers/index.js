@@ -1,8 +1,11 @@
-const createError = require("./createError");
-
-const cntrWrapper = require("./cntrWrapper");
+const RequestError = require("./RequestError");
+const ctrlWrapper = require("./ctrlWrapper");
+const handleSchemaValidationErrors = require("./handleSchemaValdationErrors");
+const sendEmail = require('./sendEmail')
 
 module.exports = {
-  createError,
-  cntrWrapper,
-};
+    RequestError,
+    ctrlWrapper,
+    handleSchemaValidationErrors,
+    sendEmail,
+}

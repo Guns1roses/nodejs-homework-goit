@@ -1,17 +1,20 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
+const {handleSchemaValidationErrors} = require("../helpers")
 
-const contactSchema = Schema(
+const contactSchema = new Schema(
   {
     name: {
       type: String,
+      unique: [true, 'Contact with this name already exists'],
       required: [true, "Set name for contact"],
     },
     email: {
       type: String,
+      unique: true,     
     },
     phone: {
-      type: String,
+      type: String,      
     },
     favorite: {
       type: Boolean,
@@ -19,28 +22,25 @@ const contactSchema = Schema(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "user",
-      required: true,
+      ref: 'user',
     },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
+
+contactSchema.post("save", handleSchemaValidationErrors)
+
+const joiSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().required(),
+  favorite: Joi.bool(),
+});
+
+const joiSchemaForFavorite = Joi.object({
+  favorite: Joi.bool().required({ message: "missing field favorite" }),
+});
 
 const Contact = model("contact", contactSchema);
 
-const contactAddSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required(),
-  favorite: Joi.bool().required(),
-});
-
-const validateSchema = Joi.object({
-  favorite: Joi.bool().required(),
-});
-
-module.exports = {
-  Contact,
-  contactAddSchema,
-  validateSchema,
-};
+module.exports = { Contact, joiSchema, joiSchemaForFavorite };

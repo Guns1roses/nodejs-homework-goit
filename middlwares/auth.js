@@ -1,29 +1,31 @@
-const { User } = require("../models");
 const jwt = require("jsonwebtoken");
-const { Unauthorized } = require("http-errors");
 
-const { SECRET_KEY } = process.env;
-console.log(process.env);
+const { RequestError } = require("../helpers");
+const { User } = require("../models");
+
+
 
 const auth = async (req, res, next) => {
+  const { SECRET_KEY } = process.env;
+
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
+  console.log(bearer);
+
+  if (bearer !== "Bearer") {
+    throw RequestError(401, "No authorized!");
+  }
   try {
-    if (bearer !== "Bearer") {
-      throw new Unauthorized("Not authorized");
-    }
     const { id } = jwt.verify(token, SECRET_KEY);
     const user = await User.findById(id);
+
     if (!user || !user.token) {
-      throw new Unauthorized("Not authorized");
+      throw RequestError(401, "No authorized!");
     }
     req.user = user;
     next();
   } catch (error) {
-    if (error.message === "Invalid sugnature") {
-      error.status = 401;
-    }
-    next(error);
+    next(RequestError(401, error.message))
   }
 };
 

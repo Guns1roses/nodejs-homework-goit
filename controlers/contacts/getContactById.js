@@ -1,20 +1,20 @@
 const { Contact } = require("../../models");
-const { createError } = require("../../helpers");
+const { RequestError } = require("../../helpers");
 
 const getContactById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await Contact.findById(contactId);
+  const { _id } = req.user;
+  const result = await Contact.findById(contactId, _id);
   if (!result) {
-    throw createError(404);
+    throw RequestError(404, `Contact with ID = ${contactId} does not exist`);
   }
-  res.json({
-    status: "success",
+  res.status(200).json({
+    status: 'success',
     code: 200,
     data: {
-      result,
-    },
-  });
-
+      result
+    }});
+    
 };
 
 module.exports = getContactById;
