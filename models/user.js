@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
+const { handleSchemaValidationErrors } = require("../helpers");
 
 const userSchema = Schema(
   {
@@ -17,32 +18,41 @@ const userSchema = Schema(
       enum: ["starter", "pro", "business"],
       default: "starter",
     },
+    avatarURL: {
+      type: String,
+      required: true,
+    },
     token: {
       type: String,
       default: null,
     },
-    avatarURL: {
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
       type: String,
-      required: true,
+      required: [true, "Verify token is required"],
     },
   },
   { versionKey: false }
 );
 
+userSchema.post("save", handleSchemaValidationErrors);
+
+const joiUserSchema = Joi.object({
+  email: Joi.string().required(),
+  password: Joi.string().required(),  
+});
+
+const verifyEmailSchema = Joi.object({
+  email: Joi.string().required(),  
+});
+
 const User = model("user", userSchema);
-
-const joiRegisterSchema = Joi.object({
-  password: Joi.string().required(),
-  email: Joi.string().required(),
-});
-
-const joiLoginSchema = Joi.object({
-  password: Joi.string().required(),
-  email: Joi.string().required(),
-});
 
 module.exports = {
   User,
-  joiRegisterSchema,
-  joiLoginSchema,
+  joiUserSchema,
+  verifyEmailSchema
 };
